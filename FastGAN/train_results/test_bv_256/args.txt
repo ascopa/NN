@@ -1,0 +1,12 @@
+{
+  "path": "/home/jovyan/NN/datasets/BV/img",
+  "cuda": 0,
+  "name": "test_bv_256",
+  "iter": 100000,
+  "start_iter": 0,
+  "batch_size": 1,
+  "im_size": 256,
+  "ckpt": "None",
+  "noise_dim": 400,
+  "fid_batch_size": 32
+}
