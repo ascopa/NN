@@ -23,7 +23,7 @@ class DatasetConfig:
     Ns = 32         # number of detectors
     Nt = 512        # number of time samples
     dx = 0.1e-3     # pixel size  in the x direction [m] 
-    nx = 256        # number of pixels in the x direction for a 2-D image region
+    nx = 128        # number of pixels in the x direction for a 2-D image region
     dsa = 22.50e-3  # radius of the circunference where the detectors are placed [m]
     arco = 360      # arc of the circunferencewhere the detectors are placed
     vs = 1500       # speed of sound [m/s]
@@ -129,7 +129,7 @@ def create_trainatestdata(): # environments: different position uncertainties
         
         h = numpynorm(h,config.vmax,config.vmin) # set data between vmin and vmax
         #h = h/np.max(h) # force maximum value = 1
-        Y[cont, 0:, 0:] = h  # Truth image for input without noise
+        Y[cont] = h.reshape(config.nx, config.nx)  # Truth image for input without noise
         h = h.ravel()
                 
         S = Ao @ h
@@ -151,13 +151,13 @@ def create_trainatestdata(): # environments: different position uncertainties
             aux = applyDAS(config.Ns,config.Nt,config.dx,config.nx,config.dsa,config.arco,config.vs,config.to,config.tf,Sm+ruido) # DAS with noise
             aux = numpynorm(aux,config.vmax,config.vmin)
             #aux = aux/np.max(np.abs(aux.ravel()))
-            Xdas[cont, 0:, 0:] = aux
+            Xdas[cont] = aux.reshape(config.nx,config.nx)
             
         if config.detLBP:
             aux = Ao.T@((Sm + ruido).ravel()) # LBP with noise
             aux = numpynorm(aux,config.vmax,config.vmin)
             #aux = aux/np.max(np.abs(aux.ravel()))
-            Xlbp[cont, 0:, 0:] = aux
+            Xlbp[cont] = aux.reshape(config.nx,config.nx)
 
             
         #print(' Image: ', i + 1, ' SNR(dB): ', int(SNR[i]))
