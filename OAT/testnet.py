@@ -20,10 +20,10 @@ class TestingConfig:
     device = 'cpu'
 
     cache_dir = 'data/' 
-    datadate = '31jul23'
-    nname = 't' + datadate # name set for testing
+    datadate = '1aug23'
+    nname = datadate # name set for testing
     
-    traindate = '31jul23' 
+    traindate = '1aug23' 
     
     ckp_last='fdunet' + traindate + '.pth' # name of the file of the saved weights of the trained net
     ckp_best='fdunet_best' + traindate + '.pth'
