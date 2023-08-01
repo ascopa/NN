@@ -41,12 +41,12 @@ class DatasetConfig:
     OneSNR = False
     
     save_sinogram = False
-    augmentation = True
+    augmentation = False
     
     detDAS = True
-    detLBP = True
+    detLBP = False
        
-    date = '27jul23'
+    date = '1aug23'
     
     shuffledata = True
     delzeroimages = True
@@ -83,8 +83,11 @@ def augmentate_retina(MI):
 
 # -----------------------------------------------------------------------------
 def numpynorm(x,vmax,vmin):
-    y = (x-np.min(x))/(np.max(x)-np.min(x))
-    y = y*(vmax-vmin) + vmin
+    if (np.max(x)-np.min(x))!=0:
+        y = (x-np.min(x))/(np.max(x)-np.min(x))
+        y = y*(vmax-vmin) + vmin
+    else:
+        y = x
     return y
 
 # ---------------------------------------------------------------------------
@@ -112,8 +115,10 @@ def create_trainatestdata(): # environments: different position uncertainties
     # DATASET FOR TRAINING    
     Ni = int(IM.shape[1]) # total images
 
-    Xdas = np.zeros((Ni*config.nsnr, config.nx, config.nx)) # corrupted pre-image
-    Xlbp = np.zeros((Ni*config.nsnr, config.nx, config.nx)) # corrupted pre-image
+    if config.detDAS:
+        Xdas = np.zeros((Ni*config.nsnr, config.nx, config.nx)) # corrupted pre-image
+    if config.detLBP:
+        Xlbp = np.zeros((Ni*config.nsnr, config.nx, config.nx)) # corrupted pre-image
     Y = np.zeros((Ni*config.nsnr, config.nx, config.nx)) # true image low resolution
     SNR = np.zeros(Ni*config.nsnr) # Signal to noise ratio of the corrupted sinogram
     SNRa1 = np.zeros(config.Ns) # SNR of each detectors
@@ -149,12 +154,14 @@ def create_trainatestdata(): # environments: different position uncertainties
 
         if config.detDAS:
             aux = applyDAS(config.Ns,config.Nt,config.dx,config.nx,config.dsa,config.arco,config.vs,config.to,config.tf,Sm+ruido) # DAS with noise
+            aux = np.reshape(aux,(config.nx,config.nx))
             aux = numpynorm(aux,config.vmax,config.vmin)
             #aux = aux/np.max(np.abs(aux.ravel()))
             Xdas[cont] = aux.reshape(config.nx,config.nx)
             
         if config.detLBP:
             aux = Ao.T@((Sm + ruido).ravel()) # LBP with noise
+            aux = np.reshape(aux,(config.nx,config.nx))
             aux = numpynorm(aux,config.vmax,config.vmin)
             #aux = aux/np.max(np.abs(aux.ravel()))
             Xlbp[cont] = aux.reshape(config.nx,config.nx)
@@ -167,8 +174,10 @@ def create_trainatestdata(): # environments: different position uncertainties
         print('Shuffling data...')
         indpat = np.arange(0, Y.shape[0], dtype=int)  
         ida = np.random.permutation(indpat)
-        Xdas = Xdas[ida, :, :]
-        Xlbp = Xlbp[ida, :, :]
+        if config.detDAS:
+            Xdas = Xdas[ida, :, :]
+        if config.detLBP:
+            Xlbp = Xlbp[ida, :, :]
         Y = Y[ida, :, :]
         SNR = SNR[ida]
 
@@ -180,14 +189,18 @@ def create_trainatestdata(): # environments: different position uncertainties
             if (not np.any(Y[i4,:,:]))==True:
                 print(i4)
                 index = np.append(index,i4)
-        Xdas = np.delete(Xdas,index,axis=0)
-        Xlbp = np.delete(Xlbp,index,axis=0)
+        if config.detDAS:
+            Xdas = np.delete(Xdas,index,axis=0)
+        if config.detLBP:
+            Xlbp = np.delete(Xlbp,index,axis=0)
         Y = np.delete(Y,index,axis=0)
         SNR = np.delete(SNR,index)
    
     print('Saving training data...')
-    np.save(os.path.join(config.cache_dir, 'Xdas'+config.variablename), Xdas)
-    np.save(os.path.join(config.cache_dir, 'Xlbp'+config.variablename), Xlbp)
+    if config.detDAS:
+        np.save(os.path.join(config.cache_dir, 'Xdas'+config.variablename), Xdas)
+    if config.detLBP:
+        np.save(os.path.join(config.cache_dir, 'Xlbp'+config.variablename), Xlbp)
     np.save(os.path.join(config.cache_dir, 'Y'+config.variablename), Y)
     np.save(os.path.join(config.cache_dir, 'SNR'+config.variablename), SNR)
    
