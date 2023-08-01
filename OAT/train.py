@@ -30,7 +30,7 @@ class ClearCache:
         torch.cuda.empty_cache()
 
 # ---------------------------------------------------------------------------
-def gettraindata(cache_dir, n_name, config.dasorlbp):
+def gettraindata(cache_dir, n_name, dasorlbp):
     
     print('Obtaining data for training...')
 
@@ -123,7 +123,7 @@ def train_net(config):
         LossFn = nn.MSELoss()
         
         # Get data
-        X,Y = gettraindata(cache_dir, n_name)
+        X,Y = gettraindata(cache_dir, n_name, config.dasorlbp)
         if config.dasorlbp == 'das':
             print('Training with DAS images')
         else:
