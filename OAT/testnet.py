@@ -20,9 +20,10 @@ class TestingConfig:
     device = 'cpu'
 
     cache_dir = 'data/' 
-    nname = 't1' # name set for testing
+    datadate = '31jul23'
+    nname = 't' + datadate # name set for testing
     
-    traindate = '24jul23' 
+    traindate = '31jul23' 
     
     ckp_last='fdunet' + traindate + '.pth' # name of the file of the saved weights of the trained net
     ckp_best='fdunet_best' + traindate + '.pth'
@@ -32,24 +33,22 @@ class TestingConfig:
     dasorlbp = 'das' #lbp
 
 # ---------------------------------------------------------------------------
-def gettestdata(cache_dir, n_name):
+def gettestdata(cache_dir, n_name, dasorlbp):
     
     print('Obtaining data for testing...')
-    
-    Xdas = np.load(os.path.join(cache_dir, 'Xdas'+n_name+'.npy')) # Noisy image obtained with DAS
-    Xlbp = np.load(os.path.join(cache_dir, 'Xlbp'+n_name+'.npy')) # Noisy image obtained with LBP
-
     Y = np.load(os.path.join(cache_dir, 'Y'+n_name+'.npy')) # True image
     SNR = np.load(os.path.join(cache_dir, 'SNR'+n_name+'.npy')) # True image
-        
-    Xdas=Xdas.astype(np.float32)
-    Xlbp=Xlbp.astype(np.float32)
     Y=Y.astype(np.float32)
     SNR=SNR.astype(np.float32)
-
-    print('done')
     
-    return Xdas,Xlbp,Y,SNR
+    if dasorlbp == 'das':
+        Xdas = np.load(os.path.join(cache_dir, 'Xdas'+n_name+'.npy')) # Noisy image obtained with DAS
+        Xdas=Xdas.astype(np.float32)
+        return Xdas,Y,SNR
+    else:
+        Xlbp = np.load(os.path.join(cache_dir, 'Xlbp'+n_name+'.npy')) # Noisy image obtained with LBP
+        Xlbp=Xlbp.astype(np.float32)
+        return Xlbp,Y,SNR
 
 # ---------------------------------------------------------------------------
 class OAImageDataset(Dataset):
@@ -89,14 +88,10 @@ def predict():
     net.load_state_dict(checkpoint['state_dict'])
     
     # Load dataset
-    Xdas,Xlbp,Y,SNR = gettestdata(config.cache_dir, config.nname)
-    if config.dasorlbp == 'das':
-        X = Xdas
-    else:
-        X = Xlbp
+    Xi,Y,SNR = gettestdata(config.cache_dir, config.nname, config.dasorlbp)
        
     # Create data loader
-    X = torch.as_tensor(X).type(torch.float32) 
+    X = torch.as_tensor(Xi).type(torch.float32) 
     
     # Prediction
     print('Making prediction...')
@@ -115,27 +110,32 @@ def predict():
     
     # Measuring the quality of the reconstruction 
     print('Calculating metrics...')
-    SSIM = np.zeros((B,3)).astype(np.float32)
-    PC = np.zeros((B,3)).astype(np.float32)
-    RMSE = np.zeros((B,3)).astype(np.float32)
-    PSNR = np.zeros((B,3)).astype(np.float32)    
+    SSIM = np.zeros((B,2)).astype(np.float32)
+    PC = np.zeros((B,2)).astype(np.float32)
+    RMSE = np.zeros((B,2)).astype(np.float32)
+    PSNR = np.zeros((B,2)).astype(np.float32)    
     for i1 in tqdm(range(0,B)):
         f1,f2,f3,f4=FoM(Y[i1,:,:],Ynet[i1,:,:])
         SSIM[i1,0]=f1; PC[i1,0]=f2; RMSE[i1,0]=f3; PSNR[i1,0]=f4
-        f1,f2,f3,f4=FoM(Y[i1,:,:],Xlbp[i1,:,:])
+        f1,f2,f3,f4=FoM(Y[i1,:,:],Xi[i1,:,:])
         SSIM[i1,1]=f1; PC[i1,1]=f2; RMSE[i1,1]=f3; PSNR[i1,1]=f4
-        f1,f2,f3,f4=FoM(Y[i1,:,:],Xdas[i1,:,:])
-        SSIM[i1,2]=f1; PC[i1,2]=f2; RMSE[i1,2]=f3; PSNR[i1,2]=f4
-        
-    print('\n')
-    print('############################################################### \n')
-    print('Metrics results NET: \n', 'SSIM: ',round(np.mean(SSIM[:,0]),3), ' PC: ', round(np.mean(PC[:,0]),3), ' RMSE: ', round(np.mean(RMSE[:,0]),3), ' PSNR: ', round(np.mean(PSNR[:,0]),3))
-    print('Metrics results LBP: \n', 'SSIM: ',round(np.mean(SSIM[:,1]),3), ' PC: ', round(np.mean(PC[:,1]),3), ' RMSE: ', round(np.mean(RMSE[:,1]),3), ' PSNR: ', round(np.mean(PSNR[:,1]),3))
-    print('Metrics results DAS: \n', 'SSIM: ',round(np.mean(SSIM[:,2]),3), ' PC: ', round(np.mean(PC[:,2]),3), ' RMSE: ', round(np.mean(RMSE[:,2]),3), ' PSNR: ', round(np.mean(PSNR[:,2]),3))
-    print('\n')
-    print('############################################################### \n')
     
-    return Xdas,Xlbp,Y,Ynet,SSIM,PC,RMSE,PSNR,SNR
+    if config.dasorlbp == 'das':
+        print('\n')
+        print('############################################################### \n')
+        print('Metrics results NET: \n', 'SSIM: ',round(np.mean(SSIM[:,0]),3), ' PC: ', round(np.mean(PC[:,0]),3), ' RMSE: ', round(np.mean(RMSE[:,0]),3), ' PSNR: ', round(np.mean(PSNR[:,0]),3))
+        print('Metrics results DAS: \n', 'SSIM: ',round(np.mean(SSIM[:,1]),3), ' PC: ', round(np.mean(PC[:,1]),3), ' RMSE: ', round(np.mean(RMSE[:,1]),3), ' PSNR: ', round(np.mean(PSNR[:,1]),3))
+        print('\n')
+        print('############################################################### \n')
+    else:
+        print('\n')
+        print('############################################################### \n')
+        print('Metrics results NET: \n', 'SSIM: ',round(np.mean(SSIM[:,0]),3), ' PC: ', round(np.mean(PC[:,0]),3), ' RMSE: ', round(np.mean(RMSE[:,0]),3), ' PSNR: ', round(np.mean(PSNR[:,0]),3))
+        print('Metrics results LBP: \n', 'SSIM: ',round(np.mean(SSIM[:,1]),3), ' PC: ', round(np.mean(PC[:,1]),3), ' RMSE: ', round(np.mean(RMSE[:,1]),3), ' PSNR: ', round(np.mean(PSNR[:,1]),3))
+        print('\n')
+        print('############################################################### \n')          
+    
+    return Xi,Y,Ynet,SSIM,PC,RMSE,PSNR,SNR
 
 # ---------------------------------------------------------------------------
 if __name__ == '__main__':
@@ -144,4 +144,4 @@ if __name__ == '__main__':
     config = TestingConfig()
     
     #Xdas,Xlbp,Y,Ynet = predict()
-    Xdas,Xlbp,Y,Ynet,SSIM,PC,RMSE,PSNR,SNR = predict()
+    X,Y,Ynet,SSIM,PC,RMSE,PSNR,SNR = predict()
