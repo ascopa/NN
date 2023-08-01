@@ -30,22 +30,23 @@ class ClearCache:
         torch.cuda.empty_cache()
 
 # ---------------------------------------------------------------------------
-def gettraindata(cache_dir, n_name):
+def gettraindata(cache_dir, n_name, config.dasorlbp):
     
     print('Obtaining data for training...')
-    
-    Xdas = np.load(os.path.join(cache_dir, 'Xdas'+n_name+'.npy')) # Noisy image obtained with DAS
-    Xlbp = np.load(os.path.join(cache_dir, 'Xlbp'+n_name+'.npy')) # Noisy image obtained with LBP
 
     Y = np.load(os.path.join(cache_dir, 'Y'+n_name+'.npy')) # True image
         
-    Xdas=Xdas.astype(np.float32)
-    Xlbp=Xlbp.astype(np.float32)
     Y=Y.astype(np.float32)
 
-    print('done')
+    if dasorlbp == 'das':
+        Xdas = np.load(os.path.join(cache_dir, 'Xdas'+n_name+'.npy')) # Noisy image obtained with DAS
+        Xdas=Xdas.astype(np.float32)
+        return Xdas,Y
+    else:
+        Xlbp = np.load(os.path.join(cache_dir, 'Xlbp'+n_name+'.npy')) # Noisy image obtained with LBP
+        Xlbp=Xlbp.astype(np.float32)
+        return Xlbp,Y
     
-    return Xdas,Xlbp,Y
 
 # ---------------------------------------------------------------------------
 class OAImageDataset(Dataset):
@@ -122,12 +123,10 @@ def train_net(config):
         LossFn = nn.MSELoss()
         
         # Get data
-        Xdas,Xlbp,Y = gettraindata(cache_dir, n_name)
+        X,Y = gettraindata(cache_dir, n_name)
         if config.dasorlbp == 'das':
-            X = Xdas
             print('Training with DAS images')
         else:
-            X = Xlbp
             print('Training with LBP images')
         
         # Create data loader
