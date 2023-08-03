@@ -15,9 +15,9 @@ hyperparameters:
 @dataclass
 class DatasetConfig:    
     cache_dir = os.path.join(os.getcwd(), 'data') 
-    datafilename = 'train_data.npy'  # Dataset for training 5652 images
+    #datafilename = 'train_data.npy'  # Dataset for training 5652 images
     #datafilename = 'retinalbloodvessels256TRAINAUG.npy'  # Dataset for training with GAN augmentation  5652x5=28260?
-    #datafilename = 'retinalbloodvessels256TEST.npy' # Dataset for testing 600 images
+    datafilename = 'test_data.npy' # Dataset for testing 600 images
     dataimgsize = 256
     
     Ns = 32         # number of detectors
