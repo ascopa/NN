@@ -21,7 +21,7 @@ class TestingConfig:
 
     cache_dir = 'data/' 
     datadate = '1aug23'
-    nname = datadate # name set for testing
+    nname = 't' + datadate # name set for testing
     
     traindate = '1aug23' 
     

@@ -54,9 +54,9 @@ class DatasetConfig:
     vmax = 1
     vmin = 0
     
-    variablename = date  # name set for training 
+    #variablename = date  # name set for training 
     #variablename = 'a'+ date  # name set for training using GAN augmentation 
-    #variablename = 't' + date  # name set for testing 
+    variablename = 't' + date  # name set for testing 
     
 # ---------------------------------------------------------------------------
 def augmentate_retina(MI):
