@@ -16,8 +16,8 @@ hyperparameters:
 class DatasetConfig:    
     cache_dir = os.path.join(os.getcwd(), 'data') 
     #datafilename = 'train_data.npy'  # Dataset for training 5652 images
-    #datafilename = 'retinalbloodvessels256TRAINAUG.npy'  # Dataset for training with GAN augmentation  5652x5=28260?
-    datafilename = 'test_data.npy' # Dataset for testing 600 images
+    datafilename = 'generated_images.npy'  # Dataset for training with GAN augmentation  5652x5=28260?
+    #datafilename = 'test_data.npy' # Dataset for testing 600 images
     dataimgsize = 256
     
     Ns = 32         # number of detectors
@@ -46,7 +46,7 @@ class DatasetConfig:
     detDAS = True
     detLBP = False
        
-    date = '1aug23'
+    date = '3aug23'
     
     shuffledata = True
     delzeroimages = True
@@ -55,8 +55,8 @@ class DatasetConfig:
     vmin = 0
     
     #variablename = date  # name set for training 
-    #variablename = 'a'+ date  # name set for training using GAN augmentation 
-    variablename = 't' + date  # name set for testing 
+    variablename = 'a'+ date  # name set for training using GAN augmentation 
+    #variablename = 't' + date  # name set for testing 
     
 # ---------------------------------------------------------------------------
 def augmentate_retina(MI):
