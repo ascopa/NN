@@ -14,12 +14,12 @@ class TrainingConfig:
     val_percent = 0.2 #0.2
     
     cache_dir = 'data/' 
-    nname = '3aug23' # name set for training
+    nname = '6aug23' # name set for training
     nname = 'a' + nname # name set for training using GAN augmentation
     
     continuetrain = False
     plotresults = True
-    traindate = '3aug23' 
+    traindate = '6aug23' 
     
     ckp_last='fdunet' + traindate + '.pth' # name of the file of the saved weights of the trained net
     ckp_best='fdunet_best' + traindate + '.pth'
