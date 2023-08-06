@@ -16,7 +16,7 @@ hyperparameters:
 class DatasetConfig:    
     cache_dir = os.path.join(os.getcwd(), 'data') 
     #datafilename = 'train_data.npy'  # Dataset for training 5652 images
-    datafilename = 'generated_images.npy'  # Dataset for training with GAN augmentation  5652x5=28260?
+    datafilename = 'augmented_dataset.npy'  # Dataset for training with GAN augmentation  5652x5=28260?
     #datafilename = 'test_data.npy' # Dataset for testing 600 images
     dataimgsize = 256
     
@@ -46,7 +46,7 @@ class DatasetConfig:
     detDAS = True
     detLBP = False
        
-    date = '3aug23'
+    date = '6aug23'
     
     shuffledata = True
     delzeroimages = True
@@ -99,6 +99,7 @@ def create_trainatestdata(): # environments: different position uncertainties
     
     print('Loading truth images...')
     IM = np.load(os.path.join(config.cache_dir, config.datafilename))  # (nx*nx,Ni)
+    print(IM.shape)
     
     # Data augmentation?
     if config.augmentation:
