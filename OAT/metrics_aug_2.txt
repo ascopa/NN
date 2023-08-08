@@ -1,4 +1,4 @@
 Metrics results NET: 
- SSIM:  0.836  PC:  0.929  RMSE:  0.087  PSNR:  21.831
+ SSIM:  0.836  +/-  0.085  PC:  0.929  +/-  0.035  RMSE:  0.087  +/-  0.032  PSNR:  21.831  +/-  3.418
 Metrics results DAS: 
  SSIM:  0.145  PC:  0.478  RMSE:  0.415  PSNR:  7.67
