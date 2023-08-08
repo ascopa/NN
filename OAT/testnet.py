@@ -123,7 +123,7 @@ def predict():
     if config.dasorlbp == 'das':
         print('\n')
         print('############################################################### \n')
-        print('Metrics results NET: \n', 'SSIM: ',round(np.mean(SSIM[:,0]),3), ' PC: ', round(np.mean(PC[:,0]),3), ' RMSE: ', round(np.mean(RMSE[:,0]),3), ' PSNR: ', round(np.mean(PSNR[:,0]),3))
+        print('Metrics results NET: \n', 'SSIM: ',round(np.mean(SSIM[:,0]),3),' +/- ',round(np.std(SSIM[:,0], ddof=1),3), ' PC: ', round(np.mean(PC[:,0]),3),' +/- ',round(np.std(PC[:,0], ddof=1),3), ' RMSE: ', round(np.mean(RMSE[:,0]),3),' +/- ',round(np.std(RMSE[:,0], ddof=1),3), ' PSNR: ', round(np.mean(PSNR[:,0]),3),' +/- ',round(np.std(PSNR[:,0], ddof=1),3))
         print('Metrics results DAS: \n', 'SSIM: ',round(np.mean(SSIM[:,1]),3), ' PC: ', round(np.mean(PC[:,1]),3), ' RMSE: ', round(np.mean(RMSE[:,1]),3), ' PSNR: ', round(np.mean(PSNR[:,1]),3))
         print('\n')
         print('############################################################### \n')
