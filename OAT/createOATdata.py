@@ -46,7 +46,7 @@ class DatasetConfig:
     detDAS = True
     detLBP = False
        
-    date = '6aug23'
+    date = '9aug23'
     
     shuffledata = True
     delzeroimages = True

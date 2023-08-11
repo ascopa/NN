@@ -1,5 +1,5 @@
 {
-  "path": "/home/jovyan/NN/datasets/BV/train",
+  "path": "f:\\backup\\Facultad\\Tesis\\NN\\datasets\\BV\\train",
   "cuda": 0,
   "name": "test_bv_256",
   "iter": 100000,
