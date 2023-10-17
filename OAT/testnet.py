@@ -112,7 +112,7 @@ def predict():
     save_dir = 'predicted_images'
     os.makedirs(save_dir, exist_ok=True)
     
-    for i in range(B):
+    for i in range(50):
         # Convert the predicted image to a PyTorch tensor and scale to [0, 1]
         predicted_image = Ynet[i, :, :]
         predicted_image = torch.tensor(predicted_image, dtype=torch.float32)
