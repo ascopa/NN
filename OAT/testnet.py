@@ -78,6 +78,24 @@ def get_testloader(X, Y, batch_size):
 
 
 # ---------------------------------------------------------------------------
+
+def save_imgs(X, dataset):
+    save_dir = dataset + '_images'
+    os.makedirs(save_dir, exist_ok=True)
+    
+    for i in range(50):
+        # Convert the predicted image to a PyTorch tensor and scale to [0, 1]
+        predicted_image = X[i, :, :]
+        predicted_image = torch.tensor(predicted_image, dtype=torch.float32)        
+        predicted_image = (predicted_image - torch.min(predicted_image)) / (torch.max(predicted_image) - torch.min(predicted_image))
+
+        # Use vutils to save the image
+        save_path = os.path.join(save_dir, dataset+f'_image_{i}.png')
+        vutils.save_image(predicted_image.add(1).mul(0.5), save_path, normalize=True)
+        print('images generated')
+        
+# ---------------------------------------------------------------------------       
+
 def predict():
     
     config = TestingConfig()
@@ -108,23 +126,9 @@ def predict():
     Ynet = pred.detach().to("cpu").numpy()
     
     B,H,W = Y.shape
-
-    save_dir = 'predicted_images'
-    os.makedirs(save_dir, exist_ok=True)
     
-    for i in range(50):
-        # Convert the predicted image to a PyTorch tensor and scale to [0, 1]
-        predicted_image = Ynet[i, :, :]
-        predicted_image = torch.tensor(predicted_image, dtype=torch.float32)
-        if torch.isnan(predicted_image).any() or torch.isinf(predicted_image).any():
-            print(f'Image {i} contains NaN or infinite values. Skipping saving.')
-        
-        predicted_image = (predicted_image - torch.min(predicted_image)) / (torch.max(predicted_image) - torch.min(predicted_image))
-
-        # Use vutils to save the image
-        save_path = os.path.join(save_dir, f'predicted_image_{i}.png')
-        vutils.save_image(predicted_image.add(1).mul(0.5), save_path, normalize=True)
-        print('images generated')
+    save_imgs(Y, "predicted")
+    save_imgs(X, "orig")
     
     # Measuring the quality of the reconstruction 
     print('Calculating metrics...')
