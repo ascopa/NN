@@ -127,8 +127,10 @@ def predict():
     
     B,H,W = Y.shape
     
-    save_imgs(Y, "predicted")
-    save_imgs(X, "orig")
+    save_imgs(X, "reconstructed")
+    save_imgs(Y, "orig")
+    save_imgs(Ynet, "predicted")
+    
     
     # Measuring the quality of the reconstruction 
     print('Calculating metrics...')
