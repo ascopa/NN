@@ -20,7 +20,7 @@ class DatasetConfig:
     #datafilename = 'test_data.npy' # Dataset for testing 600 images
     dataimgsize = 256
     
-    Ns = 32         # number of detectors
+    Ns = 128         # number of detectors
     Nt = 512        # number of time samples
     dx = 0.1e-3     # pixel size  in the x direction [m] 
     nx = 128        # number of pixels in the x direction for a 2-D image region
@@ -123,6 +123,9 @@ def create_trainatestdata(): # environments: different position uncertainties
     Y = np.zeros((Ni*config.nsnr, config.nx, config.nx)) # true image low resolution
     SNR = np.zeros(Ni*config.nsnr) # Signal to noise ratio of the corrupted sinogram
     SNRa1 = np.zeros(config.Ns) # SNR of each detectors
+
+    from torchvision import utils as vutils
+    import torch
     
     print('Obtaining reconstructed OA images (LBP/DAS)...')
     cont = -config.nsnr # Counter index
@@ -140,6 +143,16 @@ def create_trainatestdata(): # environments: different position uncertainties
                 
         S = Ao @ h
         Sm = np.reshape(S,(config.Ns,config.Nt))
+
+        predicted_image = Sm
+        predicted_image = torch.tensor(predicted_image, dtype=torch.float32)        
+        #predicted_image = (predicted_image - torch.min(predicted_image)) / (torch.max(predicted_image) - torch.min(predicted_image))
+
+        # Use vutils to save the image
+        save_path = os.path.join("das_images", "das"+f'_image_{i}.png')
+        vutils.save_image(predicted_image, save_path, normalize=True)
+        print('images generated')
+
             
         rm = 0  # white noise mean value
         nru = np.random.uniform(0, config.smax, 1)[0]
